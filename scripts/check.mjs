@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { readdir, readFile, access } from 'node:fs/promises';
 import path from 'node:path';
 const root = new URL('../dist/',import.meta.url);
-const base = 'https://tmosmant.github.io/milkee-site/';
+const base = 'https://milkee-app.github.io/';
 let count = 0;
 async function scan(dir) {
   for(const item of await readdir(dir,{withFileTypes:true})) {
@@ -20,7 +20,7 @@ async function scan(dir) {
       for(const [,ref] of html.matchAll(/(?:href|src)="([^"]+)"/g)) {
         if(ref.startsWith('#')) assert(ids.includes(ref.slice(1)),`Broken fragment ${ref}: ${file}`);
         if(ref.startsWith(base)) {
-          const parsed=new URL(ref); const relative=decodeURIComponent(parsed.pathname.slice('/milkee-site/'.length));
+          const parsed=new URL(ref); const relative=decodeURIComponent(parsed.pathname.slice(new URL(base).pathname.length));
           const target=new URL(relative.endsWith('/')?relative+'index.html':relative,root);
           await access(target);
           if(parsed.hash) assert((await readFile(target,'utf8')).includes(`id="${parsed.hash.slice(1)}"`),`Broken target fragment: ${ref}`);

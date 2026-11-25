@@ -1,6 +1,6 @@
 # Milkee website
 
-Public website: https://tmosmant.github.io/milkee-site/
+Public website: https://milkee-app.github.io/
 
 Static, accessible website for Milkee. French, English, Spanish, Chinese and Georgian pages describe the app, link to its verified Google Play listing, explain CDC-based milk storage and the app’s more cautious choices, and provide privacy, terms, legal information, help and account deletion instructions.
 
@@ -14,7 +14,7 @@ npm test
 npm run preview
 ```
 
-The preview opens at http://127.0.0.1:4173/milkee-site/fr/ and maps production links to the local server without modifying the build output.
+The preview opens at http://127.0.0.1:4173/fr/ and maps production links to the local server without modifying the build output.
 
 Edit `content/{fr,en,es,zh,ka}.json` for translations, `assets/site.css` for presentation and `scripts/build.mjs` for page structure and official source URLs. All translations must keep the same page and section structure. Language links retain the current page. The website works without JavaScript and adds no cookies or analytics. Assets and fonts are hosted locally.
 
@@ -25,16 +25,16 @@ GitHub Pages uses GitHub Actions. Every push to `main` builds and checks the sit
 The mobile app uses localized URLs of this form:
 
 ```text
-https://tmosmant.github.io/milkee-site/fr/
-https://tmosmant.github.io/milkee-site/fr/privacy/
-https://tmosmant.github.io/milkee-site/fr/terms/
-https://tmosmant.github.io/milkee-site/fr/storage/
-https://tmosmant.github.io/milkee-site/fr/legal/
-https://tmosmant.github.io/milkee-site/fr/support/
-https://tmosmant.github.io/milkee-site/fr/delete-account/
+https://milkee-app.github.io/fr/
+https://milkee-app.github.io/fr/privacy/
+https://milkee-app.github.io/fr/terms/
+https://milkee-app.github.io/fr/storage/
+https://milkee-app.github.io/fr/legal/
+https://milkee-app.github.io/fr/support/
+https://milkee-app.github.io/fr/delete-account/
 ```
 
-Replace `fr` with `en`, `es`, `zh` or `ka`. Unknown mobile locales should fall back to English. Changing the repository slug requires updating the site URL in `scripts/build.mjs`, `scripts/check.mjs` and the mobile URL configuration.
+Replace `fr` with `en`, `es`, `zh` or `ka`. Unknown mobile locales should fall back to English. Changing the GitHub Pages hostname requires updating the site URL in `scripts/build.mjs`, `scripts/check.mjs` and the mobile URL configuration.
 
 ## Content maintenance
 

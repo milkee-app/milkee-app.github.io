@@ -1,9 +1,9 @@
 import { mkdir, readFile, writeFile, cp, rm } from 'node:fs/promises';
 
 export const site = {
-  url: 'https://tmosmant.github.io/milkee-site',
-  github: 'https://github.com/tmosmant',
-  repository: 'https://github.com/tmosmant/milkee-site',
+  url: 'https://milkee-app.github.io',
+  github: 'https://github.com/milkee-app',
+  repository: 'https://github.com/milkee-app/milkee-app.github.io',
   store: 'https://play.google.com/store/apps/details?id=com.milkee.mobile',
   cdc: 'https://www.cdc.gov/breastfeeding/breast-milk-preparation-and-storage/handling-breastmilk.html',
   faq: 'https://www.cdc.gov/breastfeeding/php/guidelines-recommendations/faqs.html',
