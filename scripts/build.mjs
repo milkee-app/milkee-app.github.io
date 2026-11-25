@@ -1,4 +1,5 @@
 import { mkdir, readFile, writeFile, cp, rm } from 'node:fs/promises';
+import { createHash } from 'node:crypto';
 
 export const site = {
   url: 'https://milkee-app.github.io',
@@ -8,6 +9,8 @@ export const site = {
   cdc: 'https://www.cdc.gov/breastfeeding/breast-milk-preparation-and-storage/handling-breastmilk.html',
   faq: 'https://www.cdc.gov/breastfeeding/php/guidelines-recommendations/faqs.html',
 };
+const assetVersions = Object.fromEntries(await Promise.all(['site.css','app-home-fr.png'].map(async name => [name, createHash('sha256').update(await readFile(new URL(`../assets/${name}`,import.meta.url))).digest('hex').slice(0,12)])));
+const asset = name => `${site.url}/assets/${name}?v=${assetVersions[name]}`;
 const languages = ['fr', 'en', 'es', 'zh', 'ka'];
 const slugs = ['', 'storage', 'privacy', 'terms', 'legal', 'support', 'delete-account'];
 const content = Object.fromEntries(await Promise.all(languages.map(async lang => [lang, JSON.parse(await readFile(new URL(`../content/${lang}.json`, import.meta.url), 'utf8'))])));
@@ -25,13 +28,13 @@ function shell(lang, slug, body) {
 <meta name="description" content="${esc(description)}"><meta name="theme-color" content="#F4F2EF"><link rel="canonical" href="${url(lang, slug)}">
 ${languages.map(l => `<link rel="alternate" hreflang="${l}" href="${url(l, slug)}">`).join('')}<link rel="alternate" hreflang="x-default" href="${url('en', slug)}">
 <meta property="og:type" content="website"><meta property="og:title" content="${esc(title)}"><meta property="og:description" content="${esc(description)}"><meta property="og:url" content="${url(lang, slug)}"><meta property="og:image" content="${site.url}/assets/icon.png"><meta property="og:site_name" content="Milkee">
-<link rel="icon" type="image/png" href="${site.url}/assets/icon.png"><link rel="stylesheet" href="${site.url}/assets/site.css"></head>
+<link rel="icon" type="image/png" href="${site.url}/assets/icon.png"><link rel="stylesheet" href="${asset('site.css')}"></head>
 <body><a class="skip" href="#main">${l.skip}</a><header class="header wrap"><a class="brand" href="${url(lang)}" aria-label="Milkee · ${l.back}"><img src="${site.url}/assets/icon.png" width="40" height="40" alt="">milkee<span aria-hidden="true">.</span></a><nav class="primary-nav" aria-label="Milkee">${a(url(lang) + '#app', c.nav[0])}${a(url(lang, 'storage'), c.nav[1])}${a(url(lang, 'support'), c.nav[2])}</nav>${switcher(lang, slug)}</header>
 <main id="main">${body}</main><footer class="footer wrap"><div class="footer-brand"><a class="brand" href="${url(lang)}">milkee<span aria-hidden="true">.</span></a><p>${l.footer}</p></div><nav aria-label="Milkee">${Object.keys(c.pages).map(p => a(url(lang,p), c.pages[p].title)).join('')}${a(site.github,l.contact)}</nav><p class="date">${l.updated}</p></footer></body></html>`;
 }
 function home(lang) {
   const c = content[lang], l = c.labels;
-  return `<section class="hero wrap"><div class="hero-copy"><p class="eyebrow">${l.eyebrow}</p><h1>${c.tagline}</h1><p class="lead">${c.description}</p><div class="hero-actions"><a class="button" href="${site.store}"><svg aria-hidden="true" width="22" height="24" viewBox="0 0 22 24" fill="none"><path d="M2 1.5 14 12 2 22.5V1.5Z" fill="currentColor"/><path d="m4 1 14 8-3 2.5L4 1Zm0 22 14-8-3-2.5L4 23Zm12-11 3-2 3 2-3 2-3-2Z" fill="currentColor"/></svg>${l.download}</a>${a(url(lang,'storage'),l.learn)}</div></div><figure class="app-preview"><div class="screen"><img src="${site.url}/assets/app-home-fr.png" width="1280" height="2856" alt="${l.screenAlt}" fetchpriority="high"></div><figcaption>${l.example}</figcaption></figure></section>
+  return `<section class="hero wrap"><div class="hero-copy"><p class="eyebrow">${l.eyebrow}</p><h1>${c.tagline}</h1><p class="lead">${c.description}</p><div class="hero-actions"><a class="button" href="${site.store}"><svg aria-hidden="true" width="22" height="24" viewBox="0 0 22 24" fill="none"><path d="M2 1.5 14 12 2 22.5V1.5Z" fill="currentColor"/><path d="m4 1 14 8-3 2.5L4 1Zm0 22 14-8-3-2.5L4 23Zm12-11 3-2 3 2-3 2-3-2Z" fill="currentColor"/></svg>${l.download}</a>${a(url(lang,'storage'),l.learn)}</div></div><figure class="app-preview"><div class="screen"><img src="${asset('app-home-fr.png')}" width="1280" height="2856" alt="${l.screenAlt}" fetchpriority="high"></div><figcaption>${l.example}</figcaption></figure></section>
 <section id="app" class="features wrap"><div class="section-heading"><p class="eyebrow">Milkee</p><h2>${l.features}</h2><p>${l.featureIntro}</p></div><div class="feature-list">${c.features.map(([title,text],i)=>`<article><span class="feature-icon" aria-hidden="true">${['◉','◎','◷'][i]}</span><div><h3>${title}</h3><p>${text}</p></div></article>`).join('')}</div></section>
 <section class="storage-band"><div class="wrap"><div class="guide-heading"><h2>${l.guideTitle}</h2><p>${l.guideIntro}</p></div><div class="metrics">${c.metrics.map(([value,title,note])=>`<div><span class="metric-value">${value}</span><h3>${title}</h3><p>${note}</p></div>`).join('')}</div><a class="text-link" href="${url(lang,'storage')}">${l.guideLink}</a></div></section>`;
 }
@@ -58,7 +61,7 @@ for (const lang of languages) for (const slug of slugs) {
   await mkdir(dir,{recursive:true});
   await writeFile(new URL('index.html',dir),shell(lang,slug,slug ? article(lang,slug) : home(lang)));
 }
-const chooser = `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Milkee · Choose your language</title><meta name="description" content="Milkee — breast milk stash tracking. Choose your language."><link rel="stylesheet" href="${site.url}/assets/site.css"><link rel="icon" href="${site.url}/assets/icon.png"><link rel="canonical" href="${site.url}/"></head><body><main class="chooser wrap"><a class="brand" href="${url('en')}">milkee.</a><h1>Every pouch counts.</h1><nav aria-label="Language">${languages.map(l=>`<a class="button secondary" lang="${l}" hreflang="${l}" href="${url(l)}">${content[l].name}</a>`).join('')}</nav></main></body></html>`;
+const chooser = `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Milkee · Choose your language</title><meta name="description" content="Milkee — breast milk stash tracking. Choose your language."><link rel="stylesheet" href="${asset('site.css')}"><link rel="icon" href="${site.url}/assets/icon.png"><link rel="canonical" href="${site.url}/"></head><body><main class="chooser wrap"><a class="brand" href="${url('en')}">milkee.</a><h1>Every pouch counts.</h1><nav aria-label="Language">${languages.map(l=>`<a class="button secondary" lang="${l}" hreflang="${l}" href="${url(l)}">${content[l].name}</a>`).join('')}</nav></main></body></html>`;
 await writeFile(new URL('../dist/index.html',import.meta.url),shell('fr','',home('fr')));
 await writeFile(new URL('../dist/404.html',import.meta.url),chooser.replace('<title>Milkee · Choose your language</title>','<title>Milkee · 404</title>').replace('</head>','<meta name="robots" content="noindex"></head>').replace('<h1>Every pouch counts.</h1>','<h1>404</h1><p>Page not found · Page introuvable · Página no encontrada · 页面未找到 · გვერდი ვერ მოიძებნა</p>'));
 await writeFile(new URL('../dist/.nojekyll',import.meta.url),'');
