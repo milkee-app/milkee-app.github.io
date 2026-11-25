@@ -40,4 +40,11 @@ async function scan(dir) {
 }
 await scan(root);
 assert.equal(count,37);
+const homepage = await readFile(new URL('index.html',root),'utf8');
+assert(homepage.includes('https://play.google.com/store/apps/details?id=com.milkee.mobile'), 'Root homepage must offer the app store link');
+assert(homepage.includes('/fr/privacy/'), 'Root homepage must expose the privacy policy');
+for(const lang of ['fr','en','es','zh','ka']) {
+  const deletion = await readFile(new URL(`${lang}/delete-account/index.html`,root),'utf8');
+  assert(deletion.includes('class="notice"'), `Deletion limitations must remain prominent: ${lang}`);
+}
 console.log(`Checked ${count} HTML files: local links, fragments, language parity, metadata, image alternatives and public identity.`);
