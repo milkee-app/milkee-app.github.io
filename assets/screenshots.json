@@ -1,0 +1,34 @@
+{
+  "app": "Milkee",
+  "appVersion": "1.0.6",
+  "expoVersion": "~57.0.32",
+  "language": "fr",
+  "demoData": true,
+  "captureRun": "store-20261126-001344",
+  "images": [
+    {
+      "screen": "home",
+      "file": "app-home-fr.png",
+      "width": 1280,
+      "height": 2856,
+      "sha256": "cfa1246a6f633bb02c7404287821e301fd6a3d065c36c607491790d7aece88eb",
+      "capturedAt": "2026-11-25T23:16:00.656Z"
+    },
+    {
+      "screen": "inventory",
+      "file": "app-inventory-fr.png",
+      "width": 1280,
+      "height": 2856,
+      "sha256": "2f061e09c1391262f85cc5720b822770c86679b4bf1a540f40c967c2a499145e",
+      "capturedAt": "2026-11-25T23:16:00.657Z"
+    },
+    {
+      "screen": "sharing",
+      "file": "app-sharing-fr.png",
+      "width": 1280,
+      "height": 2856,
+      "sha256": "8ab73c194ba4a3955f3ce24da9249d492569c492d469fd158636ed10c7b4fbb9",
+      "capturedAt": "2026-11-25T23:17:31.365Z"
+    }
+  ]
+}

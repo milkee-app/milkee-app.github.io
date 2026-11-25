@@ -38,7 +38,17 @@ Replace `fr` with `en`, `es`, `zh` or `ka`. Unknown mobile locales should fall b
 
 ## Content maintenance
 
-Sources were checked on 2026-11-25. Recheck the CDC originals when storage rules change and update every translation and date. The homepage is shown directly in French at the root URL, with all five languages available from its language menu. Legal pages include a collapsible contents list on mobile. The screenshot is an existing raw store capture showing fictional data in French; captions disclose this in all languages. The artwork and font files come from the Milkee mobile project. DM Sans is distributed under the included SIL Open Font License.
+Sources were checked on 2026-11-25. Recheck the CDC originals when storage rules change and update every translation and date. The homepage is shown directly in French at the root URL, with all five languages available from its language menu. Legal pages include a collapsible contents list on mobile. The homepage presents Home, Inventory and Sharing as a wide gallery on desktop and a selectable preview on phones and tablets. Native radio controls work without JavaScript.
+
+Screenshots are raw Android captures of the current local app with fictional data in French; captions disclose this in all languages. Keep their original proportions and the entire screen, including navigation. Do not crop or reconstruct the app interface. Regenerate them in the mobile checkout with mock mode enabled in `.env.local` and Metro restarted. The capture command must target the actual development package, for example `MILKEE_CAPTURE_PACKAGE=com.milkee.mobile.dev ANDROID_SERIAL=emulator-5554 npm run store:capture`. Restore the previous local mock setting afterwards, then import the successful capture run:
+
+```sh
+node scripts/import-screenshots.mjs /path/to/mobile/audit/screens/store-latest /path/to/mobile store-YYYYMMDD-HHMMSS
+npm run build
+npm test
+```
+
+The import requires the expected run name and records dimensions, hashes, timestamps and app version in `assets/screenshots.json`. Checks verify that the published files match that record. Styles and screenshots use content-based URL versions to avoid stale browser assets. The artwork and font files come from the Milkee mobile project. DM Sans is distributed under the included SIL Open Font License.
 
 The publisher requested a GitHub-only public identity. No personal name, personal email or postal address is published. The legal page therefore provides limited publisher information and must not be represented as a complete statutory notice. No blanket legal compliance claim is made. Actual provider retention periods, processing regions and any required health-data legal basis need to be verified by the operator; this website does not invent them. Account deletion does not promise automatic deletion of historical analytics or support data. Requests containing private account information should use in-app support.
 

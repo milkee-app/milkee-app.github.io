@@ -9,7 +9,7 @@ export const site = {
   cdc: 'https://www.cdc.gov/breastfeeding/breast-milk-preparation-and-storage/handling-breastmilk.html',
   faq: 'https://www.cdc.gov/breastfeeding/php/guidelines-recommendations/faqs.html',
 };
-const assetVersions = Object.fromEntries(await Promise.all(['site.css','app-home-fr.png'].map(async name => [name, createHash('sha256').update(await readFile(new URL(`../assets/${name}`,import.meta.url))).digest('hex').slice(0,12)])));
+const assetVersions = Object.fromEntries(await Promise.all(['site.css','app-home-fr.png','app-inventory-fr.png','app-sharing-fr.png'].map(async name => [name, createHash('sha256').update(await readFile(new URL(`../assets/${name}`,import.meta.url))).digest('hex').slice(0,12)])));
 const asset = name => `${site.url}/assets/${name}?v=${assetVersions[name]}`;
 const languages = ['fr', 'en', 'es', 'zh', 'ka'];
 const slugs = ['', 'storage', 'privacy', 'terms', 'legal', 'support', 'delete-account'];
@@ -32,12 +32,30 @@ ${languages.map(l => `<link rel="alternate" hreflang="${l}" href="${url(l, slug)
 <body><a class="skip" href="#main">${l.skip}</a><header class="header wrap"><a class="brand" href="${url(lang)}" aria-label="Milkee · ${l.back}"><img src="${site.url}/assets/icon.png" width="40" height="40" alt="">milkee<span aria-hidden="true">.</span></a><nav class="primary-nav" aria-label="Milkee">${a(url(lang) + '#app', c.nav[0])}${a(url(lang, 'storage'), c.nav[1])}${a(url(lang, 'support'), c.nav[2])}</nav>${switcher(lang, slug)}</header>
 <main id="main">${body}</main><footer class="footer wrap"><div class="footer-brand"><a class="brand" href="${url(lang)}">milkee<span aria-hidden="true">.</span></a><p>${l.footer}</p></div><nav aria-label="Milkee">${Object.keys(c.pages).map(p => a(url(lang,p), c.pages[p].title)).join('')}${a(site.github,l.contact)}</nav><p class="date">${l.updated}</p></footer></body></html>`;
 }
+const playIcon = `<svg aria-hidden="true" width="22" height="24" viewBox="0 0 22 24" fill="none"><path d="M2 1.5 14 12 2 22.5V1.5Z" fill="currentColor"/><path d="m4 1 14 8-3 2.5L4 1Zm0 22 14-8-3-2.5L4 23Zm12-11 3-2 3 2-3 2-3-2Z" fill="currentColor"/></svg>`;
+const icons = [
+  '<rect x="4" y="3" width="16" height="18" rx="3"/><path d="M4 10h16M9 6v1m0 6v4"/>',
+  '<circle cx="9" cy="8" r="3"/><path d="M3 21v-2a6 6 0 0 1 12 0v2m3-16a3 3 0 0 1 0 6m1 4a5 5 0 0 1 2 4v2"/>',
+  '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+];
+const icon = paths => `<svg aria-hidden="true" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">${paths}</svg>`;
 function home(lang) {
   const c = content[lang], l = c.labels;
-  return `<section class="hero wrap"><div class="hero-copy"><p class="eyebrow">${l.eyebrow}</p><h1>${c.tagline}</h1><p class="lead">${c.description}</p><div class="hero-actions"><a class="button" href="${site.store}"><svg aria-hidden="true" width="22" height="24" viewBox="0 0 22 24" fill="none"><path d="M2 1.5 14 12 2 22.5V1.5Z" fill="currentColor"/><path d="m4 1 14 8-3 2.5L4 1Zm0 22 14-8-3-2.5L4 23Zm12-11 3-2 3 2-3 2-3-2Z" fill="currentColor"/></svg>${l.download}</a>${a(url(lang,'storage'),l.learn)}</div></div><figure class="app-preview"><div class="screen"><img src="${asset('app-home-fr.png')}" width="1280" height="2856" alt="${l.screenAlt}" fetchpriority="high"></div><figcaption>${l.example}</figcaption></figure></section>
-<section id="app" class="features wrap"><div class="section-heading"><p class="eyebrow">Milkee</p><h2>${l.features}</h2><p>${l.featureIntro}</p></div><div class="feature-list">${c.features.map(([title,text],i)=>`<article><span class="feature-icon" aria-hidden="true">${['◉','◎','◷'][i]}</span><div><h3>${title}</h3><p>${text}</p></div></article>`).join('')}</div></section>
-<section class="storage-band"><div class="wrap"><div class="guide-heading"><h2>${l.guideTitle}</h2><p>${l.guideIntro}</p></div><div class="metrics">${c.metrics.map(([value,title,note])=>`<div><span class="metric-value">${value}</span><h3>${title}</h3><p>${note}</p></div>`).join('')}</div><a class="text-link" href="${url(lang,'storage')}">${l.guideLink}</a></div></section>`;
+  const screens = ['home','inventory','sharing'];
+  return `<section class="hero wrap">
+    <div class="hero-copy"><p class="eyebrow">${icon('<path d="M12 3c-2 4-7 8-7 12a7 7 0 0 0 14 0c0-4-5-8-7-12Z"/>')}${esc(l.eyebrow)}</p><h1>${esc(c.tagline)}</h1><p class="lead">${esc(c.description)}</p><div class="hero-actions"><a class="button" href="${site.store}">${playIcon}${esc(l.download)}</a><a class="quiet-link" href="#app">${esc(c.nav[0])}</a></div><p class="platform">${esc(l.platform)}</p></div>
+    <figure class="app-preview"><fieldset><legend class="sr-only">${esc(l.previewTitle)}</legend>
+      <div class="preview-topline"><span>Milkee</span><span>Android</span></div>
+      <div class="preview-controls">${screens.map((name,i)=>`<input type="radio" name="preview" id="preview-${name}" ${i===0?'checked':''}><label for="preview-${name}">${esc(l.previewScreens[i])}</label>`).join('')}</div>
+      <div class="preview-stage"><div class="preview-orbit" aria-hidden="true"></div><div class="preview-device">${screens.map((name,i)=>`<img class="preview-image preview-${name}" src="${asset(`app-${name}-fr.png`)}" width="1280" height="2856" alt="${esc(l.previewAlts[i])}" ${i===0?'fetchpriority="high"':'loading="lazy"'}>`).join('')}</div></div>
+      </fieldset><figcaption>${esc(l.example)}</figcaption></figure>
+  </section>
+  <section id="app" class="features wrap"><div class="section-heading"><p class="eyebrow">Milkee</p><h2>${esc(l.features)}</h2><p>${esc(l.featureIntro)}</p></div><div class="feature-list">${c.features.map(([title,text],i)=>`<article><span class="feature-icon">${icon(icons[i])}</span><h3>${esc(title)}</h3><p>${esc(text)}</p></article>`).join('')}</div></section>
+  <section class="storage-band"><div class="wrap"><div class="guide-heading"><div><p class="eyebrow">${esc(l.guideEyebrow)}</p><h2>${esc(l.guideTitle)}</h2></div><div><p>${esc(l.guideIntro)}</p><a class="text-link" href="${url(lang,'storage')}">${esc(l.guideLink)}</a></div></div><div class="metrics">${c.metrics.map(([value,title,note])=>`<div><span class="metric-value">${esc(value)}</span><h3>${esc(title)}</h3><p>${esc(note)}</p></div>`).join('')}</div></div></section>
+  <section class="privacy-band wrap"><span class="privacy-icon">${icon('<rect x="5" y="10" width="14" height="11" rx="3"/><path d="M8 10V7a4 4 0 0 1 8 0v3m-4 5v2"/>')}</span><h2>${esc(l.privacyTitle)}</h2><div><p>${esc(l.privacyText)}</p><a class="text-link" href="${url(lang,'privacy')}">${esc(l.privacyLink)}</a></div></section>
+  <section class="download-band wrap"><div><h2>${esc(l.ctaTitle).replace('\n','<br>')}</h2><p>${esc(l.ctaText)}</p></div><a class="button" href="${site.store}">${playIcon}${esc(l.download)}</a></section>`;
 }
+
 function article(lang, slug) {
   const c = content[lang], p = c.pages[slug], l=c.labels;
   let refs = [];
@@ -66,5 +84,5 @@ await writeFile(new URL('../dist/index.html',import.meta.url),shell('fr','',home
 await writeFile(new URL('../dist/404.html',import.meta.url),chooser.replace('<title>Milkee · Choose your language</title>','<title>Milkee · 404</title>').replace('</head>','<meta name="robots" content="noindex"></head>').replace('<h1>Every pouch counts.</h1>','<h1>404</h1><p>Page not found · Page introuvable · Página no encontrada · 页面未找到 · გვერდი ვერ მოიძებნა</p>'));
 await writeFile(new URL('../dist/.nojekyll',import.meta.url),'');
 await writeFile(new URL('../dist/robots.txt',import.meta.url),`User-agent: *\nAllow: /\nSitemap: ${site.url}/sitemap.xml\n`);
-await writeFile(new URL('../dist/sitemap.xml',import.meta.url),`<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${languages.flatMap(lang=>slugs.map(slug=>`<url><loc>${url(lang,slug)}</loc><lastmod>2026-11-25</lastmod></url>`)).join('')}</urlset>`);
+await writeFile(new URL('../dist/sitemap.xml',import.meta.url),`<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${languages.flatMap(lang=>slugs.map(slug=>`<url><loc>${url(lang,slug)}</loc><lastmod>2026-11-26</lastmod></url>`)).join('')}</urlset>`);
 console.log(`Built ${languages.length * slugs.length} translated pages, homepage and 404.`);

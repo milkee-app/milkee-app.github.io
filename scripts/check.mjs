@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import { readdir, readFile, access } from 'node:fs/promises';
 import path from 'node:path';
+import {createHash} from 'node:crypto';
 const root = new URL('../dist/',import.meta.url);
 const base = 'https://milkee-app.github.io/';
 let count = 0;
@@ -40,10 +41,25 @@ async function scan(dir) {
 }
 await scan(root);
 assert.equal(count,37);
+const screenshots = JSON.parse(await readFile(new URL('assets/screenshots.json',root),'utf8'));
+assert.equal(screenshots.demoData,true,'Only demo captures belong on the public site');
+assert.equal(screenshots.images.length,3);
+for(const capture of screenshots.images) {
+  const bytes=await readFile(new URL(`assets/${capture.file}`,root));
+  assert.equal(createHash('sha256').update(bytes).digest('hex'),capture.sha256,'Capture provenance must match the published image');
+  assert.equal(bytes.readUInt32BE(16),capture.width);
+  assert.equal(bytes.readUInt32BE(20),capture.height);
+}
 const homepage = await readFile(new URL('index.html',root),'utf8');
 assert(homepage.includes('https://play.google.com/store/apps/details?id=com.milkee.mobile'), 'Root homepage must offer the app store link');
 assert(homepage.includes('/fr/privacy/'), 'Root homepage must expose the privacy policy');
 for(const lang of ['fr','en','es','zh','ka']) {
+  const home = await readFile(new URL(`${lang}/index.html`,root),'utf8');
+  for(const screen of ['home','inventory','sharing']) {
+    assert(home.includes(`id="preview-${screen}"`), `Missing product preview control: ${lang}/${screen}`);
+    assert(home.includes(`app-${screen}-fr.png?v=`), `Missing versioned screenshot: ${lang}/${screen}`);
+  }
+  assert.equal((home.match(/name="preview"/g)||[]).length,3, `Preview group: ${lang}`);
   const deletion = await readFile(new URL(`${lang}/delete-account/index.html`,root),'utf8');
   assert(deletion.includes('class="notice"'), `Deletion limitations must remain prominent: ${lang}`);
 }
